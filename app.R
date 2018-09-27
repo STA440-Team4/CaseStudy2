@@ -28,9 +28,9 @@ yearlist = c("2000" = 2000, "2001" = 2001, "2002" = 2002, "2003" = 2003,
 
 library(dplyr)
 library(shiny)
+library(ggplot2)
 
-
-selectedData = function(year, healthvariable) {
+selectedDataPerCapita = function(year, healthvariable) {
   healthexpenditureyear = health.expen.capita %>%
     select(Country, year) %>%
     rename(healthexpenditureyear = year)
@@ -40,9 +40,43 @@ selectedData = function(year, healthvariable) {
     rename(healthvariableyear = year)
 
   mergeddata <- merge(healthexpenditureyear, healthvariableyear, by ="Country" , all.x = TRUE)
+  
+  population = pop.total %>%
+    select(Country, year) %>%
+    rename(populationvariable = year)
+  
+  mergeddatapopulation = merge(mergeddata, population, by = "Country", all.x = TRUE)
 
-  namergedata = na.omit(mergeddata)
+  namergedata = na.omit(mergeddatapopulation)
+  return(namergedata)
 }
+
+
+selectedDataGDP = function(year, healthvariable) {
+  healthexpenditureyear = health.expen.gdp %>%
+    select(Country, year) %>%
+    rename(healthexpenditureyear = year)
+  
+  healthvariableyear = healthvariable %>%
+    select(Country, year) %>%
+    rename(healthvariableyear = year)
+  
+  mergeddata = merge(healthexpenditureyear, healthvariableyear, by ="Country" , all.x = TRUE)
+  
+  population = pop.total %>%
+    select(Country, year) %>%
+    rename(populationvariable = year)
+  
+  mergeddatapopulation = merge(mergeddata, population, by = "Country", all.x = TRUE)
+  
+  #namergedata = na.omit(mergeddata)
+  namergedata = na.omit(mergeddatapopulation)
+  return(namergedata)
+  
+}
+
+
+test1 = selectedDataGDP('2000', aids)
 
 
 # Define UI for application
@@ -57,14 +91,26 @@ ui = fluidPage(
        sliderInput("year", "Year: ", min = 2000, max = 2015, ticks = FALSE, sep = "", step = 1, value = 2000)
      ),
      mainPanel(
-       plotOutput("healthyearplot")
+       plotOutput("healthyearplotpercapita"),
+       plotOutput("healthyearplotgdp")
      )
    )
 
 server = function(input, output) {
-   output$healthyearplot = renderPlot({
-     graphdata = selectedData(toString(input$year), eval(parse(text=input$variable)))
-     ggplot(graphdata,aes(x = healthexpenditureyear, y = healthvariableyear)) + geom_point()
+   output$healthyearplotpercapita = renderPlot({
+     graphdata = selectedDataPerCapita(toString(input$year), eval(parse(text=input$variable)))
+     ggplot(graphdata,aes(x = healthexpenditureyear, y = healthvariableyear)) + geom_point(aes(size = populationvariable)) +
+       scale_size_continuous(range = c(1, 10)) +
+       xlab("Current health expenditure per capita (current US$)") +
+       ylab(toString(input$variable))
+   })
+   
+   output$healthyearplotgdp = renderPlot({
+     graphdata = selectedDataGDP(toString(input$year), eval(parse(text=input$variable)))
+     ggplot(graphdata,aes(x = healthexpenditureyear, y = healthvariableyear)) + geom_point(aes(size = populationvariable)) + 
+       scale_size_continuous(range = c(1, 10)) +
+       xlab("Current health expenditure (% of GDP)") +
+       ylab(toString(input$variable))
    })
 }
 
