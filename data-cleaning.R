@@ -145,12 +145,22 @@ out.of.pocket.expen <- out.of.pocket.expen[complete.cases(out.of.pocket.expen),]
 names(out.of.pocket.expen) <- c('Country', 2000:2015)
 save(out.of.pocket.expen, file = 'out-of-pocket-expen.RData')
 
-# Physicians (per 1,000 people)
-physicians <- rawdata %>% 
-  filter(Series.Name == 'Physicians (per 1,000 people)')
-save(physicians, file = 'physicians.RData')
-
 # Population, total
-pop.total <- rawdata %>% filter(Series.Name == 'Population, total')
+pop.total <- rawdata %>% 
+  filter(Series.Name == 'Population, total') %>% 
+  select(-c(Series.Name))
+names(pop.total) <- c('Country', 2000:2017)
 save(pop.total, file = 'pop-total.RData')
+
+# Life Expectancy total
+life.expect.total <- read.csv("Life Expectancy Total.csv")
+names(life.expect.total) <- c('Country', 2000:2016)
+save(life.expect.total, file = 'life.expect.total.RData')
+  
+# Private Expenditure 
+private.expend <- read.csv("Private expenditure.csv")
+private.expend <- private.expend[complete.cases(private.expend),]
+names(private.expend) <- c('Country', 2000:2015)
+save(private.expend, file = 'private.expend.RData')
+
 
