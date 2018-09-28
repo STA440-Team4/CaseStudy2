@@ -6,14 +6,7 @@ library(tidyr)
 library(readr)
 
 variablelist = c("AIDS estimated deaths (UNAIDS estimates) " = "aids", 
-                 #"Current health expenditure (% of GDP)" = "health.expen.gdp", 
-                 #"Current health expenditure per capita (current US$)" = "health.expen.capita",
                  "Death rate, crude (per 1,000 people)" = "death.rate",
-                 #"Domestic general government health expenditure (% of current health expenditure)" = "domestic.expen.curr.health.expen",
-                 #"Domestic general government health expenditure (% of GDP)" = "domestic.expen.gdp",
-                 #"Domestic general government health expenditure per capita (current US$)" = "domestic.expen.capita",
-                 #"External health expenditure (% of current health expenditure)" = "external.expen.curr.health.expen",
-                 #"External health expenditure per capita (current US$)" = "external.expen.capita",
                  "Life expectancy at birth, total (years)" = "life.expect.total",
                  "Life expectancy at birth, female (years)" = "life.expect.female",
                  "Life expectancy at birth, male (years)" = "life.expect.male",
@@ -149,8 +142,6 @@ selectedDataGDP = function(healthvariable){
   
   return(na.omit(finaldata))
 }
-
-
 
 
 # Define UI for application
