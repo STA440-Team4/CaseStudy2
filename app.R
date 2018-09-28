@@ -30,6 +30,30 @@ library(dplyr)
 library(shiny)
 library(ggplot2)
 
+#Merge gdp per capita data
+gdppercapita <- read_delim("gdppercapita.csv", "\t", escape_double = FALSE, trim_ws = TRUE)
+
+cleanedgdppercapita = gdppercapita %>%
+  select(`Country Name`, '2000','2001','2002','2003','2004','2005','2006',
+         '2007','2008','2009','2010','2011','2012','2013',
+         '2014','2015','2016','2017') %>%
+  rename(Country = `Country Name`)
+
+cleanedgdppercapita = cleanedgdppercapita[complete.cases(cleanedgdppercapita), ]
+
+
+
+# test6 = cleanedgdppercapita %>%
+#   select(Country, '2000') %>%
+#   rename(GDPpercapita = '2000')
+# 
+# 
+# test5 = merge(test6, death.rate, by = "Country", all.x = TRUE)
+# test5 = test5[complete.cases(test5),]
+
+
+
+
 selectedDataPerCapita = function(year, healthvariable) {
   healthexpenditureyear = health.expen.capita %>%
     select(Country, year) %>%
@@ -46,10 +70,33 @@ selectedDataPerCapita = function(year, healthvariable) {
     rename(populationvariable = year)
   
   mergeddatapopulation = merge(mergeddata, population, by = "Country", all.x = TRUE)
-
-  namergedata = na.omit(mergeddatapopulation)
+  
+  #Include GDP data
+  gdppercapitayear = cleanedgdppercapita %>%
+    select(Country, year) %>%
+    rename(gdppercapita = year)
+  
+  #Merge GDP data with data and population 
+  mergeddatapopulationgdp = merge(mergeddatapopulation, gdppercapitayear, by = "Country", all.x = TRUE)
+  
+  #Categorize countries by income level
+  mergeddatapopulationgdp$category[mergeddatapopulationgdp$gdppercapita < 1005] = "Low-income"
+  mergeddatapopulationgdp$category[mergeddatapopulationgdp$gdppercapita <= 3955 & mergeddatapopulationgdp$gdppercapita >= 1006] = "Lower-middle income"
+  mergeddatapopulationgdp$category[mergeddatapopulationgdp$gdppercapita <= 12235 & mergeddatapopulationgdp$gdppercapita >= 3956] = "Upper-middle income"
+  mergeddatapopulationgdp$category[mergeddatapopulationgdp$gdppercapita > 12235] = "High-income"
+  
+  
+  
+  
+  namergedata = na.omit(mergeddatapopulationgdp)
   return(namergedata)
 }
+
+
+test1 = selectedDataPerCapita('2000', aids)
+
+
+
 
 
 selectedDataGDP = function(year, healthvariable) {
@@ -69,14 +116,30 @@ selectedDataGDP = function(year, healthvariable) {
   
   mergeddatapopulation = merge(mergeddata, population, by = "Country", all.x = TRUE)
   
-  #namergedata = na.omit(mergeddata)
-  namergedata = na.omit(mergeddatapopulation)
+  #Include GDP data
+  gdppercapitayear = cleanedgdppercapita %>%
+    select(Country, year) %>%
+    rename(gdppercapita = year)
+  
+  #Merge GDP data with data and population 
+  mergeddatapopulationgdp = merge(mergeddatapopulation, gdppercapitayear, by = "Country", all.x = TRUE)
+  
+  #Categorize countries by income level
+  mergeddatapopulationgdp$category[mergeddatapopulationgdp$gdppercapita < 1005] = "Low-income"
+  mergeddatapopulationgdp$category[mergeddatapopulationgdp$gdppercapita <= 3955 & mergeddatapopulationgdp$gdppercapita >= 1006] = "Lower-middle income"
+  mergeddatapopulationgdp$category[mergeddatapopulationgdp$gdppercapita <= 12235 & mergeddatapopulationgdp$gdppercapita >= 3956] = "Upper-middle income"
+  mergeddatapopulationgdp$category[mergeddatapopulationgdp$gdppercapita > 12235] = "High-income"
+
+  namergedata = na.omit(mergeddatapopulationgdp)
   return(namergedata)
   
 }
 
 
-test1 = selectedDataGDP('2000', aids)
+test2 = selectedDataGDP('2000', aids)
+
+
+
 
 
 # Define UI for application
@@ -99,7 +162,7 @@ ui = fluidPage(
 server = function(input, output) {
    output$healthyearplotpercapita = renderPlot({
      graphdata = selectedDataPerCapita(toString(input$year), eval(parse(text=input$variable)))
-     ggplot(graphdata,aes(x = healthexpenditureyear, y = healthvariableyear)) + geom_point(aes(size = populationvariable)) +
+     ggplot(graphdata,aes(x = healthexpenditureyear, y = healthvariableyear, color = category)) + geom_point(aes(size = populationvariable)) +
        scale_size_continuous(range = c(1, 10)) +
        xlab("Current health expenditure per capita (current US$)") +
        ylab(toString(input$variable))
@@ -107,7 +170,7 @@ server = function(input, output) {
    
    output$healthyearplotgdp = renderPlot({
      graphdata = selectedDataGDP(toString(input$year), eval(parse(text=input$variable)))
-     ggplot(graphdata,aes(x = healthexpenditureyear, y = healthvariableyear)) + geom_point(aes(size = populationvariable)) + 
+     ggplot(graphdata,aes(x = healthexpenditureyear, y = healthvariableyear, color = category)) + geom_point(aes(size = populationvariable)) + 
        scale_size_continuous(range = c(1, 10)) +
        xlab("Current health expenditure (% of GDP)") +
        ylab(toString(input$variable))
