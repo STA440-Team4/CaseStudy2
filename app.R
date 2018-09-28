@@ -17,8 +17,9 @@ variablelist = c("AIDS estimated deaths (UNAIDS estimates) " = "aids",
                  "Out-of-pocket expenditure per capita (current US$)" = "out.of.pocket.expen"
                  )
 
-# dataframevariables = c("aids","health.expen.gdp","health.expen.capita","death.rate",
-#                        "domestic.expen.curr.health.expen","domestic.expen.gdp") 
+dataframevariables = c("aids","health.expen.gdp","health.expen.capita","death.rate",
+                       "domestic.expen.curr.health.expen","domestic.expen.gdp")
+names(dataframevariables) = c("AIDS estimated deaths (UNAIDS estimates)")
                     
 yearlist = c("2000" = 2000, "2001" = 2001, "2002" = 2002, "2003" = 2003,
              "2004" = 2004, "2005" = 2005, "2006" = 2006, "2007" = 2007,
@@ -63,14 +64,8 @@ selectedDataPerCapita = function(healthvariable){
   
   mergeHealthCapita = merge(meltedHealthVariable,  healthexpcapita, by = c("Year", "Country"), all.x = TRUE)
   
-  #print(mergeHealthCapita)
   mergeHealthCapitaGDP = merge(mergeHealthCapita, gdppercapita, by = c("Year", "Country"), all.x = TRUE)
   finaldata = merge(mergeHealthCapitaGDP, population, by = c("Year", "Country"), all.x = TRUE)
-  
-
-  
-
-  #print(finaldata)
 
   
   #Categorize countries by income level

@@ -1,12 +1,20 @@
+library(dplyr)
+library(shiny)
+library(ggplot2)
+library(plotly)
+library(tidyr)
+library(readr)
+
 variablelist = c("AIDS estimated deaths (UNAIDS estimates) " = "aids", 
-                 "Current health expenditure (% of GDP)" = "health.expen.gdp", 
-                 "Current health expenditure per capita (current US$)" = "health.expen.capita",
+                 #"Current health expenditure (% of GDP)" = "health.expen.gdp", 
+                 #"Current health expenditure per capita (current US$)" = "health.expen.capita",
                  "Death rate, crude (per 1,000 people)" = "death.rate",
-                 "Domestic general government health expenditure (% of current health expenditure)" = "domestic.expen.curr.health.expen",
-                 "Domestic general government health expenditure (% of GDP)" = "domestic.expen.gdp",
-                 "Domestic general government health expenditure per capita (current US$)" = "domestic.expen.capita",
-                 "External health expenditure (% of current health expenditure)" = "external.expen.curr.health.expen",
-                 "External health expenditure per capita (current US$)" = "external.expen.capita",
+                 #"Domestic general government health expenditure (% of current health expenditure)" = "domestic.expen.curr.health.expen",
+                 #"Domestic general government health expenditure (% of GDP)" = "domestic.expen.gdp",
+                 #"Domestic general government health expenditure per capita (current US$)" = "domestic.expen.capita",
+                 #"External health expenditure (% of current health expenditure)" = "external.expen.curr.health.expen",
+                 #"External health expenditure per capita (current US$)" = "external.expen.capita",
+                 "Life expectancy at birth, total (years)" = "life.expect.total",
                  "Life expectancy at birth, female (years)" = "life.expect.female",
                  "Life expectancy at birth, male (years)" = "life.expect.male",
                  "Lifetime risk of maternal death (%)" = "risk.maternal.death",
@@ -17,12 +25,44 @@ variablelist = c("AIDS estimated deaths (UNAIDS estimates) " = "aids",
                  "Out-of-pocket expenditure per capita (current US$)" = "out.of.pocket.expen"
 )
 
-library(dplyr)
-library(shiny)
-library(ggplot2)
-library(plotly)
-library(tidyr)
-library(readr)
+
+dataframevariables = c("AIDS estimated deaths (UNAIDS estimates)",
+                       "Current health expenditure (% of GDP)",
+                       "Current health expenditure per capita (current US$)",
+                       "Death rate, crude (per 1,000 people)",
+                       "Domestic general government health \n expenditure (% of current health expenditure)",
+                       "Domestic general government health \n expenditure (% of GDP)",
+                       "Domestic general government health \n expenditure per capita (current US$)",
+                       "External health expenditure \n(% of current health expenditure)",
+                       "External health expenditure per capita (current US$)",
+                       "Life expectancy at birth, total (years)",
+                       "Life expectancy at birth, female (years)",
+                       "Life expectancy at birth, male (years)",
+                       "Lifetime risk of maternal death (%)",
+                       "Mortality rate, adult, female (per 1,000 female adults)",
+                       "Mortality rate, adult, male (per 1,000 male adults)",
+                       "Mortality rate, infant (per 1,000 live births)",
+                       "Number of people who are undernourished",
+                       "Out-of-pocket expenditure per capita (current US$)")
+
+names(dataframevariables) = c("aids",
+                       "health.expen.gdp",
+                       "health.expen.capita",
+                       "death.rate",
+                       "domestic.expen.curr.health.expen",
+                       "domestic.expen.gdp",
+                       "domestic.expen.capita",
+                       "external.expen.curr.health.expen",
+                       "external.expen.capita",
+                       "life.expect.total",
+                       "life.expect.female",
+                       "life.expect.male",
+                       "risk.maternal.death",
+                       "mortality.rate.female",
+                       "mortality.rate.male",
+                       "mortality.rate.infant",
+                       "undernourished",
+                       "out.of.pocket.expen")
 
 
 #Merge gdp per capita data
@@ -37,16 +77,12 @@ cleanedgdppercapita = gdppercapita %>%
 cleanedgdppercapita = cleanedgdppercapita[complete.cases(cleanedgdppercapita), ]
 
 
-
-
-
 #Select Data Based on GDP Per Capita
 
 selectedDataPerCapita = function(healthvariable){
   
   varstring = deparse(substitute(healthvariable))
 
-  
   meltedHealthVariable = gather(healthvariable, Year, healthvariable, `2000`:`2015`)
   #remove 2016/2017
   meltedHealthVariable$`2016` = NULL
@@ -76,10 +112,6 @@ selectedDataPerCapita = function(healthvariable){
   
   return(na.omit(finaldata))
 }
-
-
-
-#test20 = selectedDataPerCapita(aids)
 
 
 #Select data based on percentage of GDP
@@ -124,15 +156,12 @@ selectedDataGDP = function(healthvariable){
 # Define UI for application
 ui = fluidPage(
   
-  
   # Application title
-  titlePanel("Global Health Data"),
+  titlePanel("Global Health Expenditures and Outcomes"),
   
   sidebarPanel(
     selectInput("variable", "Choose a variable:",
                 choices = variablelist)
-    # sliderInput("year", "Year: ", min = 2000, max = 2015, ticks = FALSE, sep = "", step = 1, value = 2000,
-    #             animate = animationOptions(interval = 1500, loop = TRUE))
   ),
   mainPanel(
     plotlyOutput("healthyearplotpercapita"),
@@ -142,58 +171,23 @@ ui = fluidPage(
 
 server = function(input, output) {
   
-  # output$healthyearplotpercapita = renderPlotly({
-  #   graphdata = selectedDataPerCapita(toString(input$year), eval(parse(text=input$variable)))
-  #   p = ggplot(graphdata,aes(x = healthexpenditureyear, y = healthvariableyear, color = category)) + geom_point(aes(size = populationvariable)) +
-  #     scale_size_continuous(range = c(1, 10)) +
-  #     xlab("Current health expenditure per capita (current US$)") +
-  #     ylab(toString(input$variable))
-  #   ggplotly(p) %>% layout(height = 800, width = 800)
-  #   
-  # })
-  
-  # output$healthyearplotpercapita = renderPlotly({
-  #   graphdata = selectedDataPerCapita(toString(input$year), eval(parse(text=input$variable)))
-  #   plot_ly(graphdata, x = ~healthexpenditureyear, y = ~healthvariableyear, color = ~category,
-  #           text = ~Country)%>%
-  #     layout(legend = list(x = 100, y = 0.9), xaxis = list(title = "Current health expenditure per capita (current US$)"))
-  #   
-  # })
-  
-  # output$healthyearplotgdp = renderPlotly({
-  #   graphdata = selectedDataGDP(toString(input$year), eval(parse(text=input$variable)))
-  #   q = ggplot(graphdata,aes(x = healthexpenditureyear, y = healthvariableyear, color = category)) + geom_point(aes(size = populationvariable)) +
-  #     scale_size_continuous(range = c(1, 10)) +
-  #     xlab("Current health expenditure (% of GDP)") +
-  #     ylab(toString(input$variable))
-  #   ggplotly(q)
-  # 
-  # 
-  # })
-  
   output$healthyearplotpercapita = renderPlotly({
-    #print(eval(parse(text=input$variable)))
-    print(typeof(input$variable))
     graphdata = selectedDataPerCapita(eval(parse(text=input$variable)))
-    #print(graphdata)
     plot_ly(graphdata, x = ~healthexpenditurepercapita, y = ~healthvariable, color = ~category,
-            text = ~Country, frame = ~Year,mode = 'markers', type = 'scatter'
+            text = ~Country, frame = ~Year,mode = 'markers', type = 'scatter', ids = ~Country
     ) %>%
       layout(legend = list(x = 100, y = 0.9) ,xaxis = list(title = "Current health expenditure per capita (current US$)"),
-             yaxis = list(title = input$variable)) 
+             yaxis = list(title = dataframevariables[input$variable], titlefont = list(size = 12))) 
   })
   
   output$healthyearplotgdp = renderPlotly({
     graphdata = selectedDataGDP(eval(parse(text=input$variable)))
     plot_ly(graphdata, x = ~healthexpendituregdp, y = ~healthvariable, color = ~category,
-            text = ~Country, frame = ~Year,mode = 'markers', type = 'scatter'
+            text = ~Country, frame = ~Year,mode = 'markers', type = 'scatter', ids = ~Country
     ) %>%
       layout(legend = list(x = 100, y = 0.9) ,xaxis = list(title = "Current health expenditure (% of GDP)"),
-             yaxis = list(title = input$variable))
+             yaxis = list(title = dataframevariables[input$variable], titlefont = list(size = 12)))
   })
-  
-  
-  
   
 }
 
