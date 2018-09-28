@@ -1,0 +1,33 @@
+\documentclass[11pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
+\usepackage[top=1cm]{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
+%\geometry{landscape}                		% Activate for rotated page geometry
+%\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
+								% TeX will automatically convert eps --> pdf in pdflatex		
+\usepackage{amssymb}
+
+%SetFonts
+
+%SetFonts
+
+
+\title{Case Study 2 Write-up}
+\author{Ekim Buyuk (Reviewer), Katie Tsang(Monitor), Bihan Zhuang (Coordinator),\\ Debra Jiang (Recorder), Steven Yang(Reproducibility Checker)}
+%\date{}							% Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+For this case study, we want to investigate whether countries that spent more on healthcare per capita or devoted more of their GDP to healthcare saw better health outcomes.
+
+According to The European Journal of Health Economics in 2006, increasing health care expenditure significantly associated with large decreases in infant mortality rates but were only marginally related to life expectancy. To research this more extensively, we looked at data sets from the \footnote{http://databank.worldbank.org/data/source/world-development-indicators}{World Bank} between 2000-2015. We first grouped the countries according to the World Bank?s classifications using Gross National Income per Capita (US dollars) -- low income $(< 1,005)$, lower-middle income $(1,006 - 3,955)$, upper-middle income $(3,956 - 12,235)$ and high income $(>12,235)$. One limitation to note is that we only kept complete records, deleting any rows (countries) with missing observations from the datasets we downloaded, and there may be some bias towards the types of countries that the World Bank has data on. 
+
+To begin to visualize this question, we created a Shiny app that shows different proxies to health outcomes plotted against how much a country spent per capita as well as how much a country spent as part of their GDP. The motivation behind using both of these variables was that because per capita is measured in dollars, while some country may have a really low exchange rate, the may dedicate a lot of their GDP to health. The latter may indicate that the government is cares more about their citizens despite not having that much relative wealth, but it may also simply mean that the country has a lot of unique health issues that it needs to address. 
+
+One weakness of visualizing the data in Shiny, however, is that we are unable to see a snapshot with a lot of information for a given country at one time. Turning to Tableau, we have aimed to fill that gap. The variables we chose to visualize in our Tableau dashboard include life expectancy of females and males at birth, infant mortality rates, and maternal mortality rates. Furthermore, we break down the healthcare expenditure into three categories: Domestic General Government Health Expenditure (e.g. social health insurance contributions, compulsory prepayment etc.), External Health Expenditure (e.g. direct foreign transfers, financial inflows to the national health system from outside the country etc.), and Domestic Private Health Expenditure (e.g. direct household spending, private insurance, charitable donations etc.), all of which are shown as a percentage of current health expenditures. 
+Together, these two visualizations offer a comprehensive starting point to examining the relationship between health expenditures and health outcomes. Moving forward, we think it would be more interesting to examine what is going on in the health outcomes for countries that spend between \$0 to \$2000 per capita on health, since that is where we are seeing the most variability with respect to a lot of our data.
+
+
+
+
+\end{document}  
