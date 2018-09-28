@@ -81,9 +81,6 @@ external.expen.capita <- external.expen.capita[complete.cases(external.expen.cap
 names(external.expen.capita) <- c('Country', 2000:2015)
 save(external.expen.capita, file = 'external-expen-capita.RData')
 
-# Life expectancy at birth, total (years)
-save(life.expect.total, file = 'life.expect.total.RData')
-
 # Life expectancy at birth, female (years)  
 life.expect.female <- rawdata %>% 
   filter(Series.Name == 'Life expectancy at birth, female (years)') %>% 

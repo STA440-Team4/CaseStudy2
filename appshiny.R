@@ -5,6 +5,8 @@ library(plotly)
 library(tidyr)
 library(readr)
 
+source("data-cleaning.R")
+
 variablelist = c("AIDS estimated deaths (UNAIDS estimates) " = "aids", 
                  "Death rate, crude (per 1,000 people)" = "death.rate",
                  "Life expectancy at birth, total (years)" = "life.expect.total",
@@ -68,7 +70,6 @@ cleanedgdppercapita = gdppercapita %>%
   rename(Country = `Country Name`)
 
 cleanedgdppercapita = cleanedgdppercapita[complete.cases(cleanedgdppercapita), ]
-
 
 #Select Data Based on GDP Per Capita
 
